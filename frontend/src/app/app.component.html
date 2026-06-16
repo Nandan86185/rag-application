@@ -1,0 +1,82 @@
+<div class="app-wrapper">
+  <header class="hero">
+    <div class="logo-glow"></div>
+    <h1 class="title">Omni<span class="highlight">Mind</span></h1>
+    <p class="subtitle">Universal Knowledge Assistant</p>
+  </header>
+
+  <main class="glass-panel main-container">
+
+    <!-- Upload Section -->
+    <section class="upload-section" [class.collapsed]="documentReady">
+      <div class="upload-box" [class.has-file]="selectedFile">
+        <input type="file" id="fileUpload" (change)="onFileSelected($event)"
+          accept=".pdf,.docx,.txt,.md,.csv,.xlsx,.xls,.pptx,.html,.htm,.json" [disabled]="isUploading" hidden>
+        <label for="fileUpload" class="upload-label">
+          <div class="icon-container">
+            <svg *ngIf="!selectedFile" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <svg *ngIf="selectedFile" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" class="text-green">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <p class="upload-text">{{ selectedFile ? selectedFile.name : 'Drag & Drop or Click to Browse' }}</p>
+          <span class="supported-formats" *ngIf="!selectedFile">PDF · DOCX · TXT · CSV · XLSX · PPTX · HTML · JSON ·
+            MD</span>
+        </label>
+      </div>
+
+      <button class="btn-primary" [disabled]="!selectedFile || isUploading" (click)="uploadDocument()">
+        <span *ngIf="!isUploading">Ingest Knowledge</span>
+        <span *ngIf="isUploading" class="loader"></span>
+      </button>
+
+      <p class="status-message" [class.success]="documentReady" *ngIf="uploadMessage">
+        {{ uploadMessage }}
+      </p>
+    </section>
+
+    <!-- Agent Status -->
+    <p class="mode-description" *ngIf="documentReady">
+    </p>
+
+    <!-- Chat Section -->
+    <section class="chat-section">
+      <div class="chat-window" #chatContainer>
+        <div class="message-bubble" *ngFor="let msg of messages" [ngClass]="msg.role">
+          <div class="avatar" [ngClass]="msg.role">
+            {{ msg.role === 'assistant' ? (msg.mode === 'agent' ? '🤖' : 'AI') : 'U' }}
+          </div>
+          <div class="message-content">
+            <p>{{ msg.text }}</p>
+          </div>
+        </div>
+
+        <div class="message-bubble assistant typing-indicator" *ngIf="isTyping">
+          <div class="avatar assistant">🤖</div>
+          <div class="message-content">
+            <div class="dots"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <input type="text" [(ngModel)]="currentQuery" (keyup.enter)="sendMessage()"
+          [placeholder]="'Ask me anything — from your document or the web...'"
+          [disabled]="isTyping">
+        <button class="btn-send" (click)="sendMessage()" [disabled]="!currentQuery.trim() || isTyping">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+          </svg>
+        </button>
+      </div>
+    </section>
+
+  </main>
+</div>
